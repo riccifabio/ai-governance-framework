@@ -1,0 +1,941 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Ethics & Governance Checklist — Interactive (v1.0)</title>
+  <style>
+    /* --- Bootstrap-ish design tokens --- */
+    :root{
+      --bs-body-bg:#f8f9fa;
+      --bs-body-color:#212529;
+      --bs-muted:#6c757d;
+      --bs-border:#dee2e6;
+      --bs-card-bg:#ffffff;
+      --bs-shadow:0 .5rem 1rem rgba(0,0,0,.10);
+
+      --bs-primary:#0d6efd;
+      --bs-success:#198754; /* High = green */
+      --bs-warning:#fd7e14; /* Medium = orange */
+      --bs-danger:#dc3545;  /* Low = red */
+
+      --bs-radius:.75rem;
+      --bs-radius-sm:.5rem;
+      --bs-font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+                 Arial, "Noto Sans", "Liberation Sans", sans-serif;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--bs-font);
+      background:var(--bs-body-bg);
+      color:var(--bs-body-color);
+      line-height:1.4;
+    }
+
+    /* --- Layout --- */
+    .container{
+      max-width: 1100px;
+      margin: 24px auto 80px;
+      padding: 0 16px;
+    }
+    .row{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 16px;
+      align-items:start;
+    }
+    @media (max-width: 992px){
+      .row{grid-template-columns:1fr}
+    }
+
+    /* --- Header --- */
+    .header{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-bottom: 16px;
+    }
+    .header h1{
+      margin:0;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing:.2px;
+    }
+    .lead{
+      margin:0;
+      color: var(--bs-muted);
+      font-size: 14px;
+      max-width: 950px;
+    }
+
+    /* --- Buttons --- */
+    .btnbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:6px;
+      align-items:center;
+    }
+    .btn{
+      border:1px solid var(--bs-border);
+      background:#fff;
+      color:var(--bs-body-color);
+      padding:10px 12px;
+      border-radius: var(--bs-radius-sm);
+      font-weight: 700;
+      font-size: 13px;
+      cursor:pointer;
+      box-shadow: 0 1px 0 rgba(0,0,0,.02);
+      transition: transform .05s ease, background .15s ease, border-color .15s ease;
+      white-space:nowrap;
+    }
+    .btn:hover{background:#f1f3f5;border-color:#cfd4da}
+    .btn:active{transform: translateY(1px)}
+    .btn-primary{
+      background: var(--bs-primary);
+      border-color: var(--bs-primary);
+      color:#fff;
+    }
+    .btn-primary:hover{background:#0b5ed7;border-color:#0b5ed7}
+    .btn-danger{
+      background: var(--bs-danger);
+      border-color: var(--bs-danger);
+      color:#fff;
+    }
+    .btn-danger:hover{background:#bb2d3b;border-color:#bb2d3b}
+
+    /* --- Cards --- */
+    .card{
+      background: var(--bs-card-bg);
+      border: 1px solid var(--bs-border);
+      border-radius: var(--bs-radius);
+      box-shadow: var(--bs-shadow);
+      overflow: hidden;
+    }
+    .card-header{
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--bs-border);
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .card-header h2{
+      margin:0;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing:.2px;
+    }
+    .card-body{padding: 12px 14px}
+
+    /* --- Alerts / Notes --- */
+    .alert{
+      border:1px solid #cfe2ff;
+      background:#e7f1ff;
+      color:#0a58ca;
+      padding: 12px;
+      border-radius: var(--bs-radius-sm);
+      font-size: 13px;
+      line-height: 1.35;
+      margin-bottom: 12px;
+    }
+    .alert strong{font-weight:900}
+
+    /* --- Small “saved” indicator --- */
+    .status{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:12px;
+      color:var(--bs-muted);
+      white-space:nowrap;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      background: var(--bs-success);
+      box-shadow: 0 0 0 .15rem rgba(25,135,84,.15);
+    }
+    .dot.idle{
+      background: #adb5bd;
+      box-shadow:none;
+    }
+
+    /* --- Inline input --- */
+    .inline{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .small-input{
+      width: 220px;
+      max-width: 100%;
+      padding: 9px 10px;
+      border:1px solid var(--bs-border);
+      border-radius: var(--bs-radius-sm);
+      font-size: 13px;
+      outline:none;
+      background:#fff;
+      color: var(--bs-body-color);
+    }
+    .small-input:focus{
+      border-color: rgba(13,110,253,.6);
+      box-shadow: 0 0 0 .2rem rgba(13,110,253,.15);
+    }
+
+    /* --- Accordion (Bootstrap-like) --- */
+    .section-title{
+      margin: 14px 0 8px;
+      font-size: 13px;
+      font-weight: 900;
+      color:#343a40;
+      letter-spacing:.15px;
+    }
+
+    details.accordion-item{
+      border:1px solid var(--bs-border);
+      border-radius: var(--bs-radius-sm);
+      background:#fff;
+      margin: 10px 0;
+      overflow:hidden;
+    }
+    details.accordion-item[open]{
+      box-shadow: 0 .25rem .75rem rgba(0,0,0,.06);
+    }
+    summary.accordion-button{
+      list-style:none;
+      cursor:pointer;
+      padding: 12px;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      user-select:none;
+      background:#fff;
+    }
+    summary.accordion-button::-webkit-details-marker{display:none}
+
+    .qnum{
+      min-width: 34px;
+      height: 28px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius: 999px;
+      background: rgba(13,110,253,.10);
+      border: 1px solid rgba(13,110,253,.25);
+      color: #0b5ed7;
+      font-weight: 900;
+      font-size: 12px;
+    }
+    .qtitle{
+      flex:1;
+      font-weight: 800;
+      font-size: 13.5px;
+      line-height:1.25;
+    }
+    .qmeta{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      white-space:nowrap;
+      font-size:12px;
+      color:var(--bs-muted);
+    }
+    .pill{
+      border:1px solid var(--bs-border);
+      background:#f8f9fa;
+      padding: 4px 8px;
+      border-radius:999px;
+    }
+
+    .accordion-body{
+      border-top: 1px solid var(--bs-border);
+      padding: 12px;
+      display:grid;
+      gap:10px;
+    }
+    .explain{
+      font-size:13px;
+      color:#212529;
+    }
+    .explain .muted{color:var(--bs-muted)}
+
+    /* --- Layout: score row + full-width comment below --- */
+    .field-row{
+      display:grid;
+      grid-template-columns: 260px 1fr;
+      gap: 12px;
+      align-items:start;
+    }
+    @media (max-width: 700px){
+      .field-row{grid-template-columns: 1fr;}
+    }
+
+    label{
+      display:block;
+      font-size: 12px;
+      color: var(--bs-muted);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    select, textarea, input[type="text"]{
+      width:100%;
+      padding: 10px;
+      border:1px solid var(--bs-border);
+      border-radius: var(--bs-radius-sm);
+      font-size: 13px;
+      outline:none;
+      background:#fff;
+      color: var(--bs-body-color);
+    }
+    textarea{
+      min-height: 160px;
+      resize: vertical;
+    }
+    select:focus, textarea:focus, input[type="text"]:focus{
+      border-color: rgba(13,110,253,.6);
+      box-shadow: 0 0 0 .2rem rgba(13,110,253,.15);
+    }
+
+    /* --- Summary right panel --- */
+    .summary-list{
+      display:grid;
+      gap:10px;
+    }
+    .summary-row{
+      border:1px solid var(--bs-border);
+      background:#fff;
+      border-radius: var(--bs-radius-sm);
+      padding: 10px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 10px;
+    }
+    .summary-row strong{font-size: 13px}
+    .summary-row small{display:block; color:var(--bs-muted); margin-top:2px}
+
+    /* --- Badges with colors --- */
+    .badge{
+      font-weight: 900;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      white-space:nowrap;
+    }
+    .badge-low{
+      color: #fff;
+      background: var(--bs-danger);
+      border-color: var(--bs-danger);
+    }
+    .badge-medium{
+      color: #212529;
+      background: rgba(253,126,20,.22);
+      border-color: rgba(253,126,20,.45);
+    }
+    .badge-high{
+      color:#fff;
+      background: var(--bs-success);
+      border-color: var(--bs-success);
+    }
+    .badge-na{
+      color: var(--bs-muted);
+      background:#f1f3f5;
+      border-color: var(--bs-border);
+    }
+
+    .tiny{
+      font-size: 12px;
+      color: var(--bs-muted);
+      line-height: 1.35;
+      margin-top: 10px;
+    }
+
+    /* --- Final section --- */
+    .final-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 900px){
+      .final-grid{grid-template-columns:1fr}
+    }
+
+    /* --- Print --- */
+    @media print{
+      body{background:#fff}
+      .btnbar{display:none !important}
+      .container{margin:0; padding:0; max-width:none}
+      .row{grid-template-columns:1fr}
+      .card{box-shadow:none}
+      details.accordion-item{page-break-inside:avoid}
+      .header{margin-bottom: 10px}
+      .status{display:none}
+      .inline{display:none}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>AI Ethics &amp; Governance Checklist — v1.0 (Interactive)</h1>
+      <p class="lead">
+        A printable, decision-support worksheet: 40 questions in an accordion, each with a <strong>1–5 score</strong> and a detailed comment.
+        Scores indicate <strong>decision readiness</strong> (how governed the decision is), not whether the AI is “ethical”.
+      </p>
+
+      <div class="btnbar">
+        <button class="btn btn-primary" id="btnPrint">Print / Save as PDF</button>
+        <button class="btn" id="btnExpand">Expand all</button>
+        <button class="btn" id="btnCollapse">Collapse all</button>
+
+        <div class="inline" title="Used for exported filename only.">
+          <span style="font-size:12px;color:var(--bs-muted);font-weight:700;">Export name:</span>
+          <input class="small-input" id="exportName" type="text" placeholder="e.g., Vendor X — Loan Model" />
+          <button class="btn" id="btnExportJson">Export JSON</button>
+          <button class="btn" id="btnImportJson">Import JSON</button>
+          <input type="file" id="fileImport" accept="application/json" style="display:none" />
+        </div>
+
+        <button class="btn btn-danger" id="btnReset">Reset (clear all data)</button>
+
+        <div class="status" title="All data is saved in your browser (localStorage).">
+          <span class="dot idle" id="saveDot"></span>
+          <span id="saveText">Saved locally</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- LEFT: QUESTIONS -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Questions (Accordion)</h2>
+          <span class="pill" style="font-size:12px;color:var(--bs-muted);font-weight:700;">LocalStorage enabled</span>
+        </div>
+
+        <div class="card-body">
+          <div class="alert">
+            <strong>1–5 scale</strong><br/>
+            1 = Not addressed · 2 = Acknowledged but unmanaged · 3 = Partially managed · 4 = Managed explicitly · 5 = Managed &amp; documented.<br/><br/>
+            <strong>Rule:</strong> there is no single “total score” that certifies anything. One weak section can justify stopping or constraining deployment.
+          </div>
+
+          <div id="accordion"></div>
+
+          <div class="card" style="margin-top:14px;border-radius:var(--bs-radius);">
+            <div class="card-header">
+              <h2>Final Notes</h2>
+            </div>
+            <div class="card-body">
+              <div class="final-grid">
+                <div>
+                  <label for="finalDecision">Final decision (one sentence)</label>
+                  <input type="text" id="finalDecision" placeholder="e.g., Deploy as decision support, not as autonomous decision-making." />
+                </div>
+                <div>
+                  <label for="finalOwner">Owner / Accountability</label>
+                  <input type="text" id="finalOwner" placeholder="e.g., Head of Risk + Product Owner + Data Lead" />
+                </div>
+              </div>
+
+              <div class="final-grid" style="margin-top:10px;">
+                <div>
+                  <label for="finalRisks">Key risks (3–6 lines)</label>
+                  <textarea id="finalRisks" placeholder="List the main risks and governance concerns."></textarea>
+                </div>
+                <div>
+                  <label for="finalActions">Actions / next steps (3–6 lines)</label>
+                  <textarea id="finalActions" placeholder="What must be done before moving forward (tests, mitigations, governance)."></textarea>
+                </div>
+              </div>
+
+              <div class="tiny">
+                Tip: Print to PDF and attach to the decision log, procurement documentation, or governance review minutes.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- RIGHT: SUMMARY -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Section Summary</h2>
+        </div>
+        <div class="card-body">
+          <div class="summary-list" id="summary"></div>
+          <div class="tiny">
+            Thresholds (average on 1–5 scale): <strong>High</strong> ≥ 4.0 · <strong>Medium</strong> 3.0–3.9 · <strong>Low</strong> &lt; 3.0
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---------------- Data ----------------
+    const storageKey = "ai_governance_checklist_v1_en_bootstrapish";
+
+    const sections = [
+      {
+        id: "s1",
+        title: "1. Decision Context & Purpose",
+        questions: [
+          { n: 1, t: "Is the decision that the AI system supports or automates clearly defined?",
+            e: "Clarify what decision is being influenced (support vs recommendation vs decision). Also document what is explicitly out of scope." },
+          { n: 2, t: "Is the intended purpose of the system explicit and documented?",
+            e: "Write down purpose + scope + non-use cases. If this is missing, governance will drift." },
+          { n: 3, t: "Is there a risk of function creep (use beyond the original purpose)?",
+            e: "Identify plausible reuse scenarios and define guardrails (policy, access controls, contractual limits, approval workflow)." },
+          { n: 4, t: "Would the decision still be acceptable without AI, or is AI compensating for organizational weaknesses?",
+            e: "If AI is masking broken processes, poor data, or staffing gaps, the risk of unjustified delegation increases." }
+        ]
+      },
+      {
+        id: "s2",
+        title: "2. Human Impact & Affected Stakeholders",
+        questions: [
+          { n: 5, t: "Who is directly affected by the system’s outputs or decisions?",
+            e: "Identify the people impacted (exclusion, prioritization, pricing, access). Segment by severity and exposure." },
+          { n: 6, t: "Who is indirectly affected, even if not immediately visible?",
+            e: "Consider downstream effects on families, teams, communities, and dependent services." },
+          { n: 7, t: "Are vulnerable groups potentially impacted?",
+            e: "Identify groups with higher exposure (language barriers, disability, poverty). Define targeted safeguards." },
+          { n: 8, t: "Can affected individuals understand that AI is involved in the decision?",
+            e: "Define disclosure and communication: what you tell people, when, in what language, and through which channels." }
+        ]
+      },
+      {
+        id: "s3",
+        title: "3. Degree of Automation & Human Control",
+        questions: [
+          { n: 9, t: "What level of automation is in place (support, recommendation, decision)?",
+            e: "Name the level explicitly. If “support” becomes “de facto decision” in practice, governance is illusory." },
+          { n: 10, t: "Is there a meaningful human-in-the-loop or human-on-the-loop?",
+            e: "Define who oversees what, when, with which tools, and with what time budget and authority." },
+          { n: 11, t: "Can a human override or stop the system?",
+            e: "Override must be real: permissions, UI/UX, procedure, and accountability. Stop means kill switch + triggers." },
+          { n: 12, t: "Is human intervention realistic in practice, not just on paper?",
+            e: "Check incentives, workload, and SLAs. If overrides exist but are never used, it’s a governance anti-pattern." }
+        ]
+      },
+      {
+        id: "s4",
+        title: "4. Transparency & Explainability",
+        questions: [
+          { n: 13, t: "Can the system’s behavior be explained at an appropriate level to different stakeholders?",
+            e: "You need different explanations for: operators, managers, affected individuals, and auditors/regulators." },
+          { n: 14, t: "Are explanations available before, during, or after a decision?",
+            e: "Before: criteria & limits. During: reasons & factors. After: traceability & review path. Define timing and channels." },
+          { n: 15, t: "Is there a gap between what developers understand and what decision-makers understand?",
+            e: "Reduce the gap with training, documentation, and shared vocabulary. Over-reliance on vendor claims is a risk." },
+          { n: 16, t: "Would a reasonable person accept the decision if it were explained to them?",
+            e: "Defensibility test: plain language reasons, ability to contest, and visible accountability." }
+        ]
+      },
+      {
+        id: "s5",
+        title: "5. Responsibility & Accountability",
+        questions: [
+          { n: 17, t: "Who is accountable for the outcomes produced with the AI system?",
+            e: "Name a clear accountable owner (not a generic group). Accountability remains human and internal." },
+          { n: 18, t: "Is responsibility clearly assigned, or implicitly shifted to “the system”?",
+            e: "Watch language and practice: ‘the AI decided’ signals dangerous responsibility drift." },
+          { n: 19, t: "Are escalation paths defined when something goes wrong?",
+            e: "Define escalation triggers, timelines, roles, and decision authority. Integrate with incident management." },
+          { n: 20, t: "Is accountability preserved even when third-party vendors are involved?",
+            e: "Contracts should cover audit support, incident reporting, model changes, data lineage, explainability, and exit strategy." }
+        ]
+      },
+      {
+        id: "s6",
+        title: "6. Data & Bias Awareness",
+        questions: [
+          { n: 21, t: "Is the origin of training and input data known and documented?",
+            e: "Document data lineage: sources, collection, transformations, quality checks. Without this, you can’t govern drift/bias." },
+          { n: 22, t: "Are there known biases or data limitations relevant to the context?",
+            e: "List known limitations (coverage gaps, class imbalance, underreporting). This is operational honesty, not pessimism." },
+          { n: 23, t: "Has the system been tested for uneven impact across groups?",
+            e: "Run differential impact tests: segment metrics, error analysis, thresholds, and periodic reviews." },
+          { n: 24, t: "Are mitigation strategies in place, or are risks merely acknowledged?",
+            e: "Mitigate via policy, human review thresholds, data improvements, retraining, monitoring, and removal of proxies." }
+        ]
+      },
+      {
+        id: "s7",
+        title: "7. Risk, Harm & Proportionality",
+        questions: [
+          { n: 25, t: "What is the worst plausible harm this system could cause?",
+            e: "Do scenario planning: edge cases, abuse, systemic errors. Not only accuracy—real harm to people." },
+          { n: 26, t: "How reversible are the system’s decisions?",
+            e: "Define review windows, repair mechanisms, and human escalation. Low reversibility means lower automation." },
+          { n: 27, t: "Is the level of automation proportionate to the risk involved?",
+            e: "Higher impact requires more restraint: decision support + robust controls for high-risk contexts." },
+          { n: 28, t: "Are safeguards aligned with the severity of potential harm?",
+            e: "Safeguards: audit trail, monitoring, thresholds, escalation, challenge rights, manual fallback, kill switch." }
+        ]
+      },
+      {
+        id: "s8",
+        title: "8. Right to Challenge & Dissent",
+        questions: [
+          { n: 29, t: "Can affected individuals challenge or contest decisions?",
+            e: "Provide clear channels: human contact, review request, timelines. Without dissent, you’re automating without legitimacy." },
+          { n: 30, t: "Is there a clear process to request review or explanation?",
+            e: "Define who receives requests, who decides, timelines, required evidence, and documented outcomes." },
+          { n: 31, t: "Are dissenting opinions allowed internally during deployment decisions?",
+            e: "Create space for dissent: risk committee, red team, structured review. If dissent is punished, governance collapses." },
+          { n: 32, t: "Is disagreement treated as a governance signal, not as resistance?",
+            e: "Treat dissent patterns as triggers for reassessment; don’t let them remain ‘noise’." }
+        ]
+      },
+      {
+        id: "s9",
+        title: "9. Monitoring & Evolution",
+        questions: [
+          { n: 33, t: "Is the system’s performance monitored over time?",
+            e: "Monitor drift, errors, segment performance, incidents, override rate—beyond throughput." },
+          { n: 34, t: "Are ethical or social risks reviewed periodically, not only at launch?",
+            e: "Schedule governance reviews (quarterly/biannual): impact, fairness, complaints, dissent, context changes." },
+          { n: 35, t: "Is there a process to update, limit, or retire the system?",
+            e: "Define lifecycle rules: update/rollback/retirement criteria, exit strategy, and manual fallback." },
+          { n: 36, t: "Are past decisions revisited when context or impact changes?",
+            e: "Define reassessment triggers: policy changes, complaint spikes, incidents, new stakeholders, process changes." }
+        ]
+      },
+      {
+        id: "s10",
+        title: "Final Reflection (Do Not Skip)",
+        questions: [
+          { n: 37, t: "If this decision were made public tomorrow, could it be reasonably defended?",
+            e: "Legitimacy test: what would you say to press, auditors, or citizens/customers? If you can’t answer, governance is missing." },
+          { n: 38, t: "Are we accepting this decision because it is right, or because it is convenient?",
+            e: "Separate value from convenience. If convenience dominates, strengthen guardrails or reduce automation." },
+          { n: 39, t: "Are we still in control of the system, or is the system shaping our choices?",
+            e: "Check dependency: override rate, automation bias, organizational pressure. If the system drives choices, risk increases." },
+          { n: 40, t: "Would we make the same decision again, knowing what we know now?",
+            e: "If the answer is uncertain, document conditions that must change before proceeding." }
+        ]
+      }
+    ];
+
+    // ---------------- LocalStorage helpers ----------------
+    function loadState(){
+      try { return JSON.parse(localStorage.getItem(storageKey) || "{}"); }
+      catch { return {}; }
+    }
+    function saveState(state){
+      localStorage.setItem(storageKey, JSON.stringify(state));
+      flashSaved();
+    }
+
+    const state = loadState();
+
+    function ensureQ(id){
+      if (!state[id]) state[id] = { score: "", comment: "" };
+      return state[id];
+    }
+
+    // ---------------- Save indicator ----------------
+    let saveTimer = null;
+    function flashSaved(){
+      const dot = document.getElementById("saveDot");
+      const text = document.getElementById("saveText");
+      if (!dot || !text) return;
+
+      dot.classList.remove("idle");
+      text.textContent = "Saved locally";
+      if (saveTimer) clearTimeout(saveTimer);
+      saveTimer = setTimeout(()=>{
+        dot.classList.add("idle");
+        text.textContent = "Saved locally";
+      }, 650);
+    }
+
+    // ---------------- Readiness ----------------
+    function readinessFromAvg(avg){
+      if (avg >= 4.0) return { label: "High", cls: "badge-high" };
+      if (avg >= 3.0) return { label: "Medium", cls: "badge-medium" };
+      return { label: "Low", cls: "badge-low" };
+    }
+
+    function ratingLabel(v){
+      const map = { 1:"Low", 2:"Low–Medium", 3:"Medium", 4:"High", 5:"High+" };
+      return map[v] || "—";
+    }
+
+    // ---------------- Export/Import helpers ----------------
+    function sanitizeFilenamePart(s){
+      return (s || "")
+        .trim()
+        .replace(/[\/\\?%*:|"<>]/g, "-")
+        .replace(/\s+/g, " ")
+        .slice(0, 80);
+    }
+
+    function downloadText(filename, text, mime="application/json"){
+      const blob = new Blob([text], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function safeParseJson(text){
+      try { return JSON.parse(text); }
+      catch { return null; }
+    }
+
+    function buildExportEnvelope(){
+      const exportName = sanitizeFilenamePart(document.getElementById("exportName")?.value || "");
+      return {
+        _meta: {
+          schema: "ai-governance-checklist",
+          version: "v1.0",
+          exportedAt: new Date().toISOString(),
+          name: exportName || null
+        },
+        data: state
+      };
+    }
+
+    function replaceState(newState){
+      for (const k of Object.keys(state)) delete state[k];
+      for (const [k, v] of Object.entries(newState || {})) state[k] = v;
+      saveState(state);
+      render(); // re-render everything
+    }
+
+    // ---------------- Render ----------------
+    const accordion = document.getElementById("accordion");
+    const summary = document.getElementById("summary");
+
+    function render(){
+      accordion.innerHTML = "";
+      summary.innerHTML = "";
+
+      sections.forEach((sec)=>{
+        const title = document.createElement("div");
+        title.className = "section-title";
+        title.textContent = sec.title;
+        accordion.appendChild(title);
+
+        sec.questions.forEach((q)=>{
+          const qid = `q${q.n}`;
+          const qs = ensureQ(qid);
+
+          const d = document.createElement("details");
+          d.className = "accordion-item";
+          d.dataset.section = sec.id;
+          d.dataset.qid = qid;
+
+          const scoreVal = qs.score ? Number(qs.score) : "";
+
+          d.innerHTML = `
+            <summary class="accordion-button">
+              <span class="qnum">${q.n}</span>
+              <span class="qtitle">${q.t}</span>
+              <span class="qmeta">
+                <span class="pill">Score: <strong>${scoreVal || "—"}</strong></span>
+                <span class="pill">${scoreVal ? ratingLabel(scoreVal) : "Not rated"}</span>
+              </span>
+            </summary>
+            <div class="accordion-body">
+              <div class="explain">
+                <strong>Guidance:</strong>
+                <span class="muted">${q.e}</span>
+              </div>
+
+              <div class="field-row">
+                <div>
+                  <label for="${qid}_score">Score (1–5)</label>
+                  <select id="${qid}_score">
+                    <option value="">— Select —</option>
+                    <option value="1">1 — Not addressed</option>
+                    <option value="2">2 — Acknowledged but unmanaged</option>
+                    <option value="3">3 — Partially managed</option>
+                    <option value="4">4 — Managed explicitly</option>
+                    <option value="5">5 — Managed & documented</option>
+                  </select>
+                </div>
+                <div class="tiny" style="margin-top:22px;">
+                  Tip: write evidence (“what exists”) + gap (“what’s missing”) + next step (“what makes this a 4/5”).
+                </div>
+              </div>
+
+              <div>
+                <label for="${qid}_comment">Comment (full width)</label>
+                <textarea id="${qid}_comment" placeholder="Be concrete: evidence, decision, gaps, next steps…"></textarea>
+              </div>
+            </div>
+          `;
+
+          accordion.appendChild(d);
+
+          const sel = d.querySelector(`#${qid}_score`);
+          const txt = d.querySelector(`#${qid}_comment`);
+          sel.value = qs.score;
+          txt.value = qs.comment;
+
+          sel.addEventListener("change", ()=>{
+            state[qid].score = sel.value;
+            saveState(state);
+            updateAll();
+          });
+
+          txt.addEventListener("input", ()=>{
+            state[qid].comment = txt.value;
+            saveState(state);
+          });
+        });
+      });
+
+      // Final fields
+      ["finalDecision","finalOwner","finalRisks","finalActions"].forEach((id)=>{
+        const el = document.getElementById(id);
+        if (!state[id]) state[id] = "";
+        el.value = state[id];
+        el.addEventListener("input", ()=>{
+          state[id] = el.value;
+          saveState(state);
+        });
+      });
+
+      flashSaved();
+      updateAll();
+    }
+
+    function sectionAverages(){
+      return sections.map((sec)=>{
+        let sum=0, count=0;
+        sec.questions.forEach((q)=>{
+          const v = Number(state[`q${q.n}`]?.score || 0);
+          if (v > 0){ sum += v; count += 1; }
+        });
+        return {
+          id: sec.id,
+          title: sec.title,
+          avg: count ? (sum / count) : 0,
+          answered: count,
+          total: sec.questions.length
+        };
+      });
+    }
+
+    function updateSummary(){
+      summary.innerHTML = "";
+      const avgs = sectionAverages();
+
+      avgs.forEach((s)=>{
+        const badge = s.answered ? readinessFromAvg(s.avg) : { label: "Not started", cls: "badge-na" };
+
+        const row = document.createElement("div");
+        row.className = "summary-row";
+        row.innerHTML = `
+          <div>
+            <strong>${s.title}</strong>
+            <small>Answered: ${s.answered}/${s.total} · Avg: ${s.answered ? s.avg.toFixed(2) : "—"}</small>
+          </div>
+          <div class="badge ${badge.cls}">${badge.label}</div>
+        `;
+        summary.appendChild(row);
+      });
+    }
+
+    function updateQuestionPills(){
+      document.querySelectorAll("details.accordion-item").forEach((d)=>{
+        const qid = d.dataset.qid;
+        const score = Number(state[qid]?.score || 0);
+        const pills = d.querySelectorAll(".pill");
+        const strong = d.querySelector(".pill strong");
+        if (strong) strong.textContent = score ? score : "—";
+        if (pills && pills.length >= 2){
+          pills[1].textContent = score ? ratingLabel(score) : "Not rated";
+        }
+      });
+    }
+
+    function updateAll(){
+      updateSummary();
+      updateQuestionPills();
+    }
+
+    // ---------------- Buttons ----------------
+    document.getElementById("btnPrint").addEventListener("click", ()=>window.print());
+
+    document.getElementById("btnExpand").addEventListener("click", ()=>{
+      document.querySelectorAll("details.accordion-item").forEach(d=>d.open=true);
+    });
+
+    document.getElementById("btnCollapse").addEventListener("click", ()=>{
+      document.querySelectorAll("details.accordion-item").forEach(d=>d.open=false);
+      window.scrollTo({top:0, behavior:"smooth"});
+    });
+
+    document.getElementById("btnReset").addEventListener("click", ()=>{
+      if(!confirm("This will delete all saved scores and comments for this page. Continue?")) return;
+      localStorage.removeItem(storageKey);
+      location.reload();
+    });
+
+    // Export JSON with name
+    document.getElementById("btnExportJson").addEventListener("click", ()=>{
+      const envelope = buildExportEnvelope();
+      const name = sanitizeFilenamePart(document.getElementById("exportName")?.value || "");
+      const date = new Date().toISOString().slice(0,10);
+      const base = name ? `ai-governance-checklist_${name}_${date}` : `ai-governance-checklist_${date}`;
+      downloadText(`${base}.json`, JSON.stringify(envelope, null, 2));
+    });
+
+    // Import JSON
+    const fileImport = document.getElementById("fileImport");
+    document.getElementById("btnImportJson").addEventListener("click", ()=>{
+      fileImport.value = "";
+      fileImport.click();
+    });
+
+    fileImport.addEventListener("change", async ()=>{
+      const file = fileImport.files && fileImport.files[0];
+      if (!file) return;
+
+      const text = await file.text();
+      const parsed = safeParseJson(text);
+
+      if (!parsed){
+        alert("Invalid JSON file.");
+        return;
+      }
+
+      // Accept both:
+      // A) envelope { _meta, data }
+      // B) raw state object
+      const incoming = (parsed && parsed.data && typeof parsed.data === "object") ? parsed.data : parsed;
+
+      if (!incoming || typeof incoming !== "object"){
+        alert("JSON does not contain valid checklist data.");
+        return;
+      }
+
+      const ok = confirm("Import will REPLACE your current saved checklist data (scores, comments, final notes). Continue?");
+      if (!ok) return;
+
+      replaceState(incoming);
+    });
+
+    // Initial render
+    render();
+  </script>
+</body>
+</html>
